@@ -12,7 +12,7 @@ import { databaseGetOneGroup, databaseGetUsersGroup, databaseJoinGroup } from '@
 const Sidebar = () => {
   
   const topbar = useRecoilValue(topbarToggle);
-  const {groupChats,getGroupChats,groupFiltered} = useRecoilValue(groupChatState);
+  const {groupChats,getGroupChats,groupFiltered,createGroupChat} = useRecoilValue(groupChatState);
   const setFilter = useSetRecoilState(groupChatFilter);
   const setGroupChats = useSetRecoilState(groupChatsListState);
   const [groupSelected,setSelectGroup] = useRecoilState(groupChatSelectState);
@@ -28,7 +28,8 @@ const Sidebar = () => {
     if(userChat?.groups){
         const val:Array<string> = Object.values(userChat.groups)
         getGroupChats(setGroupChats,val).then((groups)=>{
-          selectGroup(groups[0])          
+          if(groups)
+            selectGroup(groups[0])          
         }) 
     }
   }, [])
@@ -101,7 +102,7 @@ const Sidebar = () => {
         <div className='mt-2 mx-1'>
           {groupChats.map((item,index)=>(
             <div onClick={()=>selectGroup(item)} 
-            className={`${'p-2   rounded mt-3 flex items-center gap-3 duration-200'} + 
+            className={`${'p-2   rounded my-3 flex items-center gap-3 duration-200'} + 
             ${item.id == groupSelected?.id ? 'bg-[#379CD6] hover:bg-[#298ac2]'  : 'bg-[#D9D9D9] hover:bg-[#bebebe]'} `} key={index}>
               {item.image ? <img src={item.image} alt={item.name} width={15} height={15} className='rounded-full h-15 w-15' />:
               <p className=' rounded-full bg-white w-8 h-8 items-center justify-center flex'>{item.name.slice(0,2)}</p>}
