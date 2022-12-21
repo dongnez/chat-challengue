@@ -14,7 +14,7 @@ const Home = () => {
         <h1 className='font-semibold'>ChatChallenge</h1>
       
         <>{user ?
-          <button className=' bg-blue-500 rounded text-white p-[8px] w-fit' onClick={()=>router.push('/app')}>Entrar a app</button>
+          <button className=' bg-blue-500 rounded text-white p-[8px] w-fit' onClick={()=>router.push('/app')}>Enter to app</button>
           :
           <button className='bg-blue-500 rounded text-white p-[8px] w-fit' onClick={()=>router.push('/login')}>Sign up</button>}</>
         

@@ -77,7 +77,7 @@ const Login = () => {
 
             
 
-        <p >Don't have an account? <Link href={'/register'}>Register</Link></p>
+        <p >Dont have an account? <Link href={'/register'}>Register</Link></p>
 
       </form>
       </div>
