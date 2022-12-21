@@ -5,8 +5,9 @@ import React from 'react'
 import { useRecoilValue } from 'recoil'
 
 const Home = () => {
-  const {user} = useAuth();
   const router = useRouter();
+  const {login,user,closeSession} = useAuth();
+  //closeSession();
 
   return (
     <div className='m-auto w-fit mt-[30px] box-border flex flex-col items-center gap-3' >

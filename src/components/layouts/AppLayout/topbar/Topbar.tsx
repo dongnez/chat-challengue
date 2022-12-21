@@ -1,4 +1,5 @@
 import { useAuth } from '@context/auth/AuthContext';
+import { Router, useRouter } from 'next/router';
 import React, { useState } from 'react'
 import { atom, useSetRecoilState } from 'recoil'
 
@@ -12,6 +13,7 @@ const Topbar = () => {
   const setTodoList = useSetRecoilState(topbarToggle);
   const [menu,setMenu] = useState(false);
   const {closeSession} = useAuth();
+  //const router = useRouter(); router.push('/login')
 
   return (
     <div className='h-[34px] flex border-b border-gray-300 items-center px-5  relative z-10'>
@@ -22,7 +24,7 @@ const Topbar = () => {
 
       {menu && 
       <section className='absolute top-10 right-5 bg-red-300 min-h-5 rounded'>
-        <p onClick={closeSession} className='p-2 hover:bg-red-400 rounded cursor-pointer'>Close Session</p>
+        <p onClick={()=>{closeSession(); }} className='p-2 hover:bg-red-400 rounded cursor-pointer'>Close Session</p>
       </section>}
 
     </div>

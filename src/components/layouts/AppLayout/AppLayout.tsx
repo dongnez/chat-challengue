@@ -11,9 +11,9 @@ const AppLayout = ({children}:AppLayoutProps) => {
 
   
   return (
-    <div className='w-screen h-screen z-0 relative'>
+    <div className='w-screen h-screen z-0'>
         <Topbar/>
-        <div className='flex relative'>
+        <div className='flex'>
             <Sidebar/>
             {children}
         </div>

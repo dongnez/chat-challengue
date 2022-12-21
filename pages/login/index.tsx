@@ -13,7 +13,8 @@ const Login = () => {
 
   const [error, setError] = useState('');
 
-  const {login,loginWithGoogle} = useAuth();
+  const {login,closeSession} = useAuth();
+  
   const router = useRouter();
 
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>)=>{

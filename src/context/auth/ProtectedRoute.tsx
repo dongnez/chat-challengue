@@ -8,9 +8,8 @@ const ProtectedRoute = (props: { children: React.ReactNode}) => {
   const router = useRouter();
   
 
-  if (loading) return <div>Cargando..</div>;
+  if (loading) return <div> <h2>Cargando...</h2></div>;
   if(!user) router.push('/login')
-
 
   return <>{props.children}</>;
 };

@@ -1,3 +1,5 @@
+import { registerUser } from '@/database/databaseFunctions';
+import { UserChat } from '@/interfaces/Users';
 import { useAuth } from '@context/auth/AuthContext';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
@@ -9,11 +11,12 @@ const Register = () => {
   const [user, setUser] = useState({
     email: '',
     password: '',
+    name:'',
   });
 
   const [error, setError] = useState('');
 
-  const {register,loginWithGoogle} = useAuth();
+  const {register} = useAuth();
   const router = useRouter();
 
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
@@ -24,7 +27,8 @@ const Register = () => {
         e.preventDefault();
         setError('');
         try {
-            await register(user.email,user.password);
+            //TODO Loader
+            await register(user.email,user.password,user.name);
             router.push('/app/');
         } catch (error) {
           if(error instanceof FirebaseError) setError(error.code); 
@@ -66,6 +70,7 @@ const Register = () => {
 
         <div className='flex flex-col gap-3' >
           <input className='border border-black rounded text-lg p-2' type="email" name="email" placeholder="Email" onChange={handleChange}/>
+          <input className='border border-black rounded text-lg p-2' type="text" name="name" placeholder="Name" onChange={handleChange}/>
           <input className='border border-black rounded text-lg p-2' type="password" min={6} name="password" placeholder="Password"  id="password" onChange={handleChange} />
           <button className='mt-2 bg-blue-400 rounded p-3' type={'submit'}>Register</button>
         </div>

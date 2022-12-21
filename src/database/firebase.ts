@@ -18,5 +18,5 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const database = getDatabase(app,'https://chat-challengue-database-default-rtdb.europe-west1.firebasedatabase.app');
+export const database = getDatabase(app,'https://chat-challengue-database-default-rtdb.europe-west1.firebasedatabase.app');
 export const auth = getAuth(app);
