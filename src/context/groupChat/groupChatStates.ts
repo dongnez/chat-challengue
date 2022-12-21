@@ -7,7 +7,7 @@ export interface GroupChatStateInterface{
     groupChats:Array<GroupChat>,
     groupFiltered:Array<GroupChat>,
     getGroupChats:(set:SetterOrUpdater<any[]>,arrayId:Array<string> )=>Promise<Array<GroupChat>>
-    createGroupChat:(set:SetterOrUpdater<any[]>,groupChat:GroupChat,userId:string) =>Promise<void>
+    createGroupChat:(set:SetterOrUpdater<any[]>,groupChat:GroupChat,userId:string) =>Promise<GroupChat>
     sendMessage:(set:SetterOrUpdater<any[]>,setSelect:SetterOrUpdater<any>,groupId:string,chatMessage:ChatMessage)=>Promise<void>
 }
 
@@ -51,12 +51,15 @@ export const groupChatState = selector<GroupChatStateInterface>({
             return []
         } 
         
-        const createGroupChat = async (set:SetterOrUpdater<any[]>,groupChat:GroupChat,userId:string) =>{
+        const createGroupChat = async (set:SetterOrUpdater<any[]>,groupChat:GroupChat,userId:string):Promise<GroupChat> =>{
             try {
                 await databaseCreateGroup(groupChat,userId);
                 set(g => [...g,groupChat]);
+
+                return groupChat;
             } catch (error) {
                 console.log(error);
+                throw error
             }
         }
         const sendMessage = async (set:SetterOrUpdater<any[]>,setSelect:SetterOrUpdater<any>,groupId:string,chatMessage:ChatMessage) =>{

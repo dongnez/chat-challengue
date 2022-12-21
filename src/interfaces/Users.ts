@@ -3,5 +3,5 @@ export interface UserChat{
     name:string
     email:string
     image:string
-    groups:[]
+    groups:string[]
 }

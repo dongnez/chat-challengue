@@ -4,7 +4,7 @@ import {auth} from "@/firebase/firebase"
 import {User,UserCredential} from 'firebase/auth'
 import React from 'react'
 import { UserChat } from "@/interfaces/Users";
-import { databaseGetUserChat, registerUser } from "@/database/databaseFunctions";
+import { databaseGetUserChat, databaseUpdateUserChat, registerUser } from "@/database/databaseFunctions";
  
 
 export interface AuthContextModel {
@@ -16,6 +16,7 @@ export interface AuthContextModel {
     loading:boolean
     loginWithGoogle:()=>Promise<UserCredential>
     resetPassword: (email: string) => Promise<void>
+    updateUserChat: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextModel>(
@@ -35,7 +36,6 @@ export default function AuthProvider(props:{children:React.ReactNode}){
     
     useEffect(()=>{
         onAuthStateChanged(auth, async (currentUser) => {
-            /* if(!currentUser){setLoading(false);return} */
 
             setUser(currentUser);
             if(currentUser){
@@ -49,10 +49,16 @@ export default function AuthProvider(props:{children:React.ReactNode}){
         })
     },[])
 
-    //* Functions
-    const register = (email:string,password:string,name:string,photoUrl?:any) => {
+    const updateUserChat = async () =>{
+        if(!userChat) return
+        const update = await databaseUpdateUserChat(userChat.uid);
+        setUserChat(update)
+    }
 
-        createUserWithEmailAndPassword(auth,email,password).then(async (currentUser)=>{
+    //* Functions
+    const register = async (email:string,password:string,name:string,photoUrl?:any) => {
+
+        await createUserWithEmailAndPassword(auth,email,password).then(async (currentUser)=>{
             const user = currentUser.user;
 
             const userChat:UserChat = { uid:user.uid,email:email,groups:[],name:name,image:'' }
@@ -68,7 +74,7 @@ export default function AuthProvider(props:{children:React.ReactNode}){
     const resetPassword = (email:string)=> sendPasswordResetEmail(auth,email);
     
     return(
-        <AuthContext.Provider value={{register,login,user,userChat,closeSession,loading,loginWithGoogle,resetPassword}}>{props.children}</AuthContext.Provider>
+        <AuthContext.Provider value={{register,login,user,userChat,updateUserChat,closeSession,loading,loginWithGoogle,resetPassword}}>{props.children}</AuthContext.Provider>
      )
     
 }

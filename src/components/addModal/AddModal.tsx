@@ -15,10 +15,10 @@ const AddModal = ({open,close}:ModalProps) => {
 
     const [group,setGroup] = useState({id:'',messages:[],name:'',users:[]});
     const [error,setError] = useState('')
-    const {createGroupChat} = useRecoilValue(groupChatState)
+    const {createGroupChat,getGroupChats} = useRecoilValue(groupChatState)
     const setGroupChats = useSetRecoilState(groupChatsListState);
 
-    const {user} = useAuth();
+    const {user,userChat,updateUserChat} = useAuth();
 
     async function createGroup(){
         if(!user) return;
@@ -28,7 +28,10 @@ const AddModal = ({open,close}:ModalProps) => {
         }
         
         close();
-        await createGroupChat(setGroupChats,group,user.uid);
+        
+        await createGroupChat(setGroupChats,group,user.uid).then(()=>{
+            updateUserChat();
+        })
         
     }
 

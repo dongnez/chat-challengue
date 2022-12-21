@@ -1,11 +1,16 @@
-import { UserChat } from './../interfaces/Users';
+import { UserChat } from '@/interfaces/Users';
 import { get, ref, set,update,push ,onChildAdded, query, limitToLast, onValue  } from 'firebase/database'
 import {database, storage} from './firebase'
 import { ChatMessage, GroupChat } from '@/interfaces/GroupChat';
 import { User } from 'firebase/auth';
 import { uploadBytes, ref as refStorage, getDownloadURL} from 'firebase/storage';
 
-
+/**
+ * Return Created Group
+ * @param groupChat 
+ * @param userId 
+ * @returns 
+ */
 export async function databaseCreateGroup(groupChat:GroupChat,userId:string):Promise<GroupChat> {
     const generatedKey = push(ref(database,'groups')).key;
     console.log('GeneratedKey...',generatedKey);
@@ -135,6 +140,7 @@ export const databaseOnUpdate = async (groupId:string,callback:()=>Promise<void>
     
     const updateRef =  query(ref(database, `groups/${groupId}/messages`),limitToLast(1))
     
+
     await onValue(updateRef,(s)=>{
         callback();
         return
@@ -145,6 +151,8 @@ export const databaseGetMessagesGroup = async  (groupId:string):Promise<Array<Ch
     
     const result = await get(ref(database,`groups/${groupId}/messages`)).then((snap)=>{
         if(!snap.exists) throw 'error/NoExist';
+        if(!snap.val()) return []
+        
         const res:Array<ChatMessage>  = Object.values(snap.val());
         return res;
     }).catch((error)=>{
@@ -156,9 +164,23 @@ export const databaseGetMessagesGroup = async  (groupId:string):Promise<Array<Ch
 
 export const databaseGetOneGroup = async (groupId:string):Promise<GroupChat| null>  =>{
     const group = await get(ref(database,'groups/'+groupId)).then((snap)=>{
-        const res = snap.val();
+        const res:GroupChat = snap.val();
+        if(!res.messages){
+            res.messages = []
+        }else res.messages = Object.values(res.messages)
+
         return res;
     })
 
     return group;
+}
+
+export const databaseUpdateUserChat = async (userId:string) =>{
+    const res = await get(ref(database,"users/"+userId)).then((snap)=>{
+        if(!snap.exists()) throw "error/userNoExist";
+        const res:UserChat = snap.val();
+        return res
+    })
+
+    return res;
 }

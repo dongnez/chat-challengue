@@ -23,8 +23,10 @@ const App = () => {
   async function addMessages(){
     if(!group) return;
     try {
-      const result = await databaseGetMessagesGroup(group.id)
-      setGroup({...group,messages:result})
+      let result = await databaseGetMessagesGroup(group.id)
+      if(!result) result = []
+      
+      setGroup({...group,messages:[...result]})
     } catch (error) {
       console.log(error);
     }
@@ -35,7 +37,7 @@ const App = () => {
     <div className=' w-full topbarResheight relative z-0 md:px-10' >
       {!group ? <h2 className='m-auto w-fit mt-3'>No groups, select one </h2>:
         <div className='flex flex-col h-full px-3'>
-          <h2 className='font-medium my-1 border-b border-gray-300 p-2'>{group.name} <small>{group.id}</small></h2>
+          <h2 className='font-medium my-1 border-b border-gray-300 p-2'>{group.name} <small className='text-xs'>{group.id}</small></h2>
 
           <Messages messages={group.messages}/>
 
