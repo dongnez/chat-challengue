@@ -14,6 +14,7 @@ export interface AuthContextModel {
     login: (email: string, password: string) => Promise<UserCredential>
     closeSession:()=> Promise<void>
     loading:boolean
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>
     loginWithGoogle:()=>Promise<UserCredential>
     resetPassword: (email: string) => Promise<void>
     updateUserChat: () => Promise<void>
@@ -36,13 +37,16 @@ export default function AuthProvider(props:{children:React.ReactNode}){
     
     useEffect(()=>{
         onAuthStateChanged(auth, async (currentUser) => {
-
+            setLoading(true);
+            
             setUser(currentUser);
-            if(currentUser){
-                const res = await databaseGetUserChat(currentUser?.uid)
-                if(res) 
-                    await setUserChat(res)
-            }
+            if(!currentUser){setLoading(false);setUserChat(null);return}
+
+            const res = await databaseGetUserChat(currentUser.uid)
+            
+            if(res) await setUserChat(res)
+            else await setUser(null)
+            
             
 
             setLoading(false);
@@ -74,7 +78,7 @@ export default function AuthProvider(props:{children:React.ReactNode}){
     const resetPassword = (email:string)=> sendPasswordResetEmail(auth,email);
     
     return(
-        <AuthContext.Provider value={{register,login,user,userChat,updateUserChat,closeSession,loading,loginWithGoogle,resetPassword}}>{props.children}</AuthContext.Provider>
+        <AuthContext.Provider value={{register,login,user,userChat,updateUserChat,closeSession,loading,setLoading,loginWithGoogle,resetPassword}}>{props.children}</AuthContext.Provider>
      )
     
 }

@@ -20,11 +20,14 @@ const Sidebar = () => {
   
   
   
-  const {userChat} = useAuth();
+  const {userChat,loading} = useAuth();
   const [addModal,setAddModal] = useState(false);
   const [error,setError] = useState('');
 
+  
   useEffect(() => { //GetGroup and select first
+   
+  
     if(userChat?.groups){
         const val:Array<string> = Object.values(userChat.groups)
         getGroupChats(setGroupChats,val).then((groups)=>{

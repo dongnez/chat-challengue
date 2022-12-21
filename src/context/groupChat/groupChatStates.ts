@@ -42,7 +42,8 @@ export const groupChatState = selector<GroupChatStateInterface>({
         
         const getGroupChats = async (set:SetterOrUpdater<GroupChat[]>,arraysIds:Array<string>):Promise<Array<GroupChat>> => {
             try {
-                const groups = await databaseGetGroups(arraysIds);
+                
+                const groups = arraysIds.length != 0 ? await databaseGetGroups(arraysIds):[]
                 await set(groups);
                 return groups;
             } catch (error) {

@@ -2,6 +2,7 @@ import { databaseGetMessagesGroup, databaseOnUpdate } from '@/database/databaseF
 import ChatInput from '@components/chatInput/ChatInput'
 import AppLayout from '@components/layouts/AppLayout/AppLayout'
 import Messages from '@components/messages/Messages'
+import { useAuth } from '@context/auth/AuthContext'
 import { groupChatSelectState, groupChatState } from '@context/groupChat/groupChatStates'
 import React,{createRef, useEffect, useMemo, useRef} from 'react'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
@@ -19,6 +20,9 @@ const App = () => {
     }
 
   },[group])
+
+  
+  
 
   async function addMessages(){
     if(!group) return;
