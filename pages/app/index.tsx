@@ -12,16 +12,17 @@ const App = () => {
   const {sendMessage} = useRecoilValue(groupChatState);
 
   useEffect(() => {
+    console.log("Change");
     
-  }, []);
+  }, [groupChatSelectState]);
   
 
   return (
     
-    <div className=' w-full topbarResheight relative z-0'>
+    <div className=' w-full topbarResheight relative z-0 md:px-10' >
       {!group ? <p>No group selected</p>:
         <div className='flex flex-col h-full px-3'>
-          <h2 className='font-medium'>{group.name}</h2>
+          <h2 className='font-medium mt-1'>{group.name}</h2>
           <Messages messages={group.messages}/>
 
           <ChatInput group={group}/>

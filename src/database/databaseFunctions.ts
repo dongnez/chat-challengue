@@ -1,7 +1,10 @@
 import { UserChat } from './../interfaces/Users';
 import { get, ref, set,update,push } from 'firebase/database'
-import {database} from './firebase'
+import {database, storage} from './firebase'
 import { ChatMessage, GroupChat } from '@/interfaces/GroupChat';
+import { User } from 'firebase/auth';
+import { uploadBytes, ref as refStorage, getDownloadURL} from 'firebase/storage';
+
 
 export async function databaseCreateGroup(groupChat:GroupChat,userId:string):Promise<GroupChat> {
     const generatedKey = push(ref(database,'groups')).key;
@@ -80,11 +83,11 @@ export async function databaseGetUsersGroup(groupUsersId:Array<string>):Promise<
         if(res) result.push(res)
     }
 
-    console.log('Data',result);
-    
 
     return result;
 }
+
+
 
 
 export async function databaseJoinGroup(userId:string,groupId:string) {
@@ -109,8 +112,31 @@ export async function databaseJoinGroup(userId:string,groupId:string) {
 
 }
 
-export async function registerUser(user:UserChat){
+export async function registerUser(user:UserChat,photoURL?:File){
+    
+    if(photoURL){
+        const url = await databaseUpdateProfileImage(user.uid,photoURL);
+        if(url || url != ''){
+            user.image = url;
+        }
+    }
+
     await update(ref(database,'users/'+user.uid),{
         ...user
     })
 }
+
+export const databaseUpdateProfileImage = async (userId:string ,image:File)=>{
+  
+    const uploadRef = refStorage(storage,`/profileImages/${userId}`);
+    
+    const url = await uploadBytes(uploadRef,image).then( async (s)=>{
+        return  await getDownloadURL(s.ref) 
+    })
+    .catch((e)=>{
+        console.log(e);
+        return ''
+    })
+    
+    return url;
+  }

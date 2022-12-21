@@ -26,6 +26,10 @@ export const groupChatSelectUsers = atom<Array<UserChat>>({ //
     default:[],
 });
 
+export const groupChatFilter = atom<string>({
+    key: 'GroupChatFilter',
+    default:''
+});
 
 export const groupChatState = selector<GroupChatStateInterface>({
     key:'GroupChatState',
@@ -88,8 +92,3 @@ export const groupChatState = selector<GroupChatStateInterface>({
     },
 });
 
-
-export const groupChatFilter = atom<string>({
-    key: 'GroupChatFilter',
-    default:''
-});

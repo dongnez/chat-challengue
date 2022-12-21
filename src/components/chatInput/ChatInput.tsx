@@ -18,20 +18,23 @@ const ChatInput = ({group}:ChatProps) => {
     const setSelected = useSetRecoilState(groupChatSelectState);
     
     const [inputValue,setInputValue] = useState('');
+    
     function enterPress(e: React.KeyboardEvent<HTMLInputElement>){
         if(!user|| inputValue.trim() == '') return;
-        if(e.key == 'Enter'){
-            const message:ChatMessage = {datestamp:new Date().getTime(),message:inputValue,userId:user.uid}
-            sendMessage(setGroup,setSelected,group.id,message);
-            setInputValue('');
-        }
-        
+        if(e.key == 'Enter') executeSend();
+    }
+
+    function executeSend(){
+        if(!user|| inputValue.trim() == '') return;
+        const message:ChatMessage = {datestamp:new Date().getTime(),message:inputValue,userId:user.uid}
+        sendMessage(setGroup,setSelected,group.id,message);
+        setInputValue('');
     }
 
   return (
     <div className='flex border border-black rounded my-3'>
         <input value={inputValue} className='bg-transparent p-[6px] flex-1 outline-0' placeholder='Send Message' onKeyDown={enterPress} onChange={(e)=>setInputValue(e.target.value)}  />
-        <MdSend className='p-1' size={36}/>
+        <MdSend onClick={executeSend} className='p-1' size={36}/>
         
     </div>
   )

@@ -10,7 +10,7 @@ import { databaseGetUserChat, registerUser } from "@/database/databaseFunctions"
 export interface AuthContextModel {
     user: User | null
     userChat: UserChat | null
-    register: (email: string, password: string,name:string) => void
+    register: (email: string, password: string,name:string,photoUrl?:any) => void
     login: (email: string, password: string) => Promise<UserCredential>
     closeSession:()=> Promise<void>
     loading:boolean
@@ -50,12 +50,13 @@ export default function AuthProvider(props:{children:React.ReactNode}){
     },[])
 
     //* Functions
-    const register = (email:string,password:string,name:string) => {
+    const register = (email:string,password:string,name:string,photoUrl?:any) => {
+
         createUserWithEmailAndPassword(auth,email,password).then(async (currentUser)=>{
             const user = currentUser.user;
 
             const userChat:UserChat = { uid:user.uid,email:email,groups:[],name:name,image:'' }
-            await registerUser(userChat);
+            await registerUser(userChat,photoUrl);
         })
     }
     const login = (email:string,password:string) => signInWithEmailAndPassword(auth,email,password);
