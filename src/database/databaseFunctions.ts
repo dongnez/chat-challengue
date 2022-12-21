@@ -1,5 +1,5 @@
 import { UserChat } from './../interfaces/Users';
-import { get, ref, set,update,push } from 'firebase/database'
+import { get, ref, set,update,push ,onChildAdded, query, limitToLast, onValue  } from 'firebase/database'
 import {database, storage} from './firebase'
 import { ChatMessage, GroupChat } from '@/interfaces/GroupChat';
 import { User } from 'firebase/auth';
@@ -67,13 +67,8 @@ export async function databaseSendMessageGroup(groupId:string,message:ChatMessag
 export async function databaseGetUsersGroup(groupUsersId:Array<string>):Promise<Array<UserChat>> {
     
     let result:Array<UserChat> = []; 
-    
-    
-    console.log('Array',groupUsersId);
-    
 
     for (const id of Object.values(groupUsersId)) {
-        console.log('Id',id);
 
         const res =  await get(ref(database,'users/'+id)).then((snap)=>{
             if(!snap.exists()) return null
@@ -88,16 +83,11 @@ export async function databaseGetUsersGroup(groupUsersId:Array<string>):Promise<
 }
 
 
-
-
 export async function databaseJoinGroup(userId:string,groupId:string) {
-    
-    
+        
     const exist = await get(ref(database,`groups/${groupId}`)).then((s)=>{
         return s.exists()
     })
-    
-
     if(!exist) throw "error/NoExist"
 
     await( update(ref(database,`groups/${groupId}/users/`),{
@@ -105,11 +95,11 @@ export async function databaseJoinGroup(userId:string,groupId:string) {
     }).catch((e)=>{
         throw e;
     }),
+    
     //Add group to User
-    update(ref(database,`users/${userId}/groups/`),{
+    await update(ref(database,`users/${userId}/groups/`),{
         [groupId]:groupId
     }))
-
 }
 
 export async function registerUser(user:UserChat,photoURL?:File){
@@ -139,4 +129,36 @@ export const databaseUpdateProfileImage = async (userId:string ,image:File)=>{
     })
     
     return url;
-  }
+}
+
+export const databaseOnUpdate = async (groupId:string,callback:()=>Promise<void>) =>{
+    
+    const updateRef =  query(ref(database, `groups/${groupId}/messages`),limitToLast(1))
+    
+    await onValue(updateRef,(s)=>{
+        callback();
+        return
+    })
+}
+
+export const databaseGetMessagesGroup = async  (groupId:string):Promise<Array<ChatMessage>> =>{
+    
+    const result = await get(ref(database,`groups/${groupId}/messages`)).then((snap)=>{
+        if(!snap.exists) throw 'error/NoExist';
+        const res:Array<ChatMessage>  = Object.values(snap.val());
+        return res;
+    }).catch((error)=>{
+        throw error
+    })
+
+    return result;
+}
+
+export const databaseGetOneGroup = async (groupId:string):Promise<GroupChat| null>  =>{
+    const group = await get(ref(database,'groups/'+groupId)).then((snap)=>{
+        const res = snap.val();
+        return res;
+    })
+
+    return group;
+}

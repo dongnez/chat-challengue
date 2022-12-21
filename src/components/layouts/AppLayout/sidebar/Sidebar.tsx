@@ -2,34 +2,37 @@ import React,{useState,useEffect} from 'react'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { topbarToggle } from '../topbar/Topbar'
 import {AiOutlineSearch} from 'react-icons/ai'
-import { groupChatState, groupChatsListState, groupChatSelectState, groupChatSelectUsers } from '@context/groupChat/groupChatStates'
+import { groupChatState, groupChatsListState, groupChatSelectState, groupChatSelectUsers, groupChatFilter } from '@context/groupChat/groupChatStates'
 import {GrFormAdd} from 'react-icons/gr'
 import AddModal from '@components/addModal/AddModal'
-import Image from 'next/image'
 import { useAuth } from '@context/auth/AuthContext'
 import { GroupChat } from '@/interfaces/GroupChat'
-import { databaseGetUsersGroup, databaseJoinGroup } from '@/database/databaseFunctions'
+import { databaseGetOneGroup, databaseGetUsersGroup, databaseJoinGroup } from '@/database/databaseFunctions'
 
 const Sidebar = () => {
   
   const topbar = useRecoilValue(topbarToggle);
-  const {groupChats,getGroupChats} = useRecoilValue(groupChatState);
+  const {groupChats,getGroupChats,groupFiltered} = useRecoilValue(groupChatState);
+  const setFilter = useSetRecoilState(groupChatFilter);
   const setGroupChats = useSetRecoilState(groupChatsListState);
   const [groupSelected,setSelectGroup] = useRecoilState(groupChatSelectState);
   const setUsers = useSetRecoilState(groupChatSelectUsers);
+  
+  
   
   const {userChat} = useAuth();
   const [addModal,setAddModal] = useState(false);
   const [error,setError] = useState('');
 
-  useEffect(() => {
+  useEffect(() => { //GetGroup and select first
     if(userChat?.groups){
-      const val:Array<string> = Object.values(userChat.groups)
-      getGroupChats(setGroupChats,val).then(()=>{
-        setSelectGroup(groupChats[0])
-      })
+        const val:Array<string> = Object.values(userChat.groups)
+        getGroupChats(setGroupChats,val).then((groups)=>{
+          selectGroup(groups[0])          
+        }) 
     }
   }, [])
+
 
   async function selectGroup(item:GroupChat){
     if(item.id == groupSelected?.id) return;
@@ -45,11 +48,17 @@ const Sidebar = () => {
 
   async function joinGroup(e: React.KeyboardEvent<HTMLInputElement> | any){
     if(!userChat) return;
-    if(e.target.value.trim() == ''){setError("Empty code");return}
     
     if(e.key == 'Enter'){
+      if(e.target.value.trim() == ''){setError("Empty code");return}
       try {
-        await databaseJoinGroup(userChat.uid,e.target.value);
+        const groupId = e.target.value;
+        await databaseJoinGroup(userChat.uid,groupId);
+        const group:GroupChat | null = await databaseGetOneGroup(groupId);
+        if(group){
+          await setGroupChats(g => [...g,group])
+        }
+        
         setError('');
       } catch (error) {
         switch (error) {
@@ -69,6 +78,7 @@ const Sidebar = () => {
   }
   
 
+
   return (
     <>
     
@@ -78,7 +88,7 @@ const Sidebar = () => {
 
       <div className='flex  items-center rounded mt-2 border border-black   px-2 sm:w-fit   self-center '>
         <AiOutlineSearch  size={25}/>
-        <input className='flex-1 h-full py-2 outline-0 rounded ' placeholder='Search'/>
+        <input className='flex-1 h-full py-2 outline-0 rounded' placeholder='Search' onChange={(e)=>{setFilter(e.target.value)}}/>
       </div> 
       
       <div className='mt-2 mx-[8px] flex-1 overflow-auto'>

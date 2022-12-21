@@ -4,8 +4,9 @@ import { databaseCreateGroup, databaseGetGroups, databaseSendMessageGroup } from
 import { UserChat } from '@/interfaces/Users';
 
 export interface GroupChatStateInterface{
-    groupChats:Array<GroupChat> 
-    getGroupChats:(set:SetterOrUpdater<any[]>,arrayId:Array<string> )=>Promise<void>
+    groupChats:Array<GroupChat>,
+    groupFiltered:Array<GroupChat>,
+    getGroupChats:(set:SetterOrUpdater<any[]>,arrayId:Array<string> )=>Promise<Array<GroupChat>>
     createGroupChat:(set:SetterOrUpdater<any[]>,groupChat:GroupChat,userId:string) =>Promise<void>
     sendMessage:(set:SetterOrUpdater<any[]>,setSelect:SetterOrUpdater<any>,groupId:string,chatMessage:ChatMessage)=>Promise<void>
 }
@@ -36,17 +37,20 @@ export const groupChatState = selector<GroupChatStateInterface>({
     get: async ({get}) =>{
         
         const groupChats:Array<GroupChat>  = get(groupChatsListState)
-        const getGroupChats = async (set:SetterOrUpdater<GroupChat[]>,arraysIds:Array<string>)=>{
+        const filter = get(groupChatFilter);
+        const groupFiltered:Array<GroupChat> = groupChats.filter((group)=> filter.trim() == ''|| filter.includes(group.name) )
+        
+        const getGroupChats = async (set:SetterOrUpdater<GroupChat[]>,arraysIds:Array<string>):Promise<Array<GroupChat>> => {
             try {
-                
                 const groups = await databaseGetGroups(arraysIds);
                 await set(groups);
-                //console.log('Groups',groups);
-                
+                return groups;
             } catch (error) {
                 console.log(error);
             }
+            return []
         } 
+        
         const createGroupChat = async (set:SetterOrUpdater<any[]>,groupChat:GroupChat,userId:string) =>{
             try {
                 await databaseCreateGroup(groupChat,userId);
@@ -55,8 +59,6 @@ export const groupChatState = selector<GroupChatStateInterface>({
                 console.log(error);
             }
         }
-
-        // * No returns
         const sendMessage = async (set:SetterOrUpdater<any[]>,setSelect:SetterOrUpdater<any>,groupId:string,chatMessage:ChatMessage) =>{
             
             const index = groupChats.findIndex(g => g.id == groupId);
@@ -88,7 +90,7 @@ export const groupChatState = selector<GroupChatStateInterface>({
             
         }
         
-        return {groupChats,getGroupChats,createGroupChat,sendMessage} 
+        return {groupChats,groupFiltered,getGroupChats,createGroupChat,sendMessage} 
     },
 });
 
