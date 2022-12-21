@@ -8,6 +8,25 @@
   padding: 0;
   margin: 0; 
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 1px grey; 
+  border-radius: 2px;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #8b8b8b; 
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #747474; 
 }
 
 @layer components {
@@ -32,6 +51,12 @@
 @layer utilities{
   .topbarResheight{
     height: calc(100vh - 34px); 
+  }
+  .scrollbarSideBar{
+    scrollbar-width: 2px;
+    scrollbar-track-color: red;/* #e2e2e2; */
+    scrollbar-color: red;
+    
   }
 }
 

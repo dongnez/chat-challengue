@@ -1,12 +1,13 @@
 import { GroupChat,ChatMessage } from './../../interfaces/GroupChat';
 import { SetterOrUpdater, atom, selector } from "recoil";
-import { databaseCreateGroup, databaseGetGroups } from '@/database/databaseFunctions';
+import { databaseCreateGroup, databaseGetGroups, databaseSendMessageGroup } from '@/database/databaseFunctions';
+import { UserChat } from '@/interfaces/Users';
 
 export interface GroupChatStateInterface{
     groupChats:Array<GroupChat> 
     getGroupChats:(set:SetterOrUpdater<any[]>,arrayId:Array<string> )=>Promise<void>
     createGroupChat:(set:SetterOrUpdater<any[]>,groupChat:GroupChat,userId:string) =>Promise<void>
-    sendMessage:(set:SetterOrUpdater<any[]>,groupId:string,chatMessage:ChatMessage)=>Promise<void>
+    sendMessage:(set:SetterOrUpdater<any[]>,setSelect:SetterOrUpdater<any>,groupId:string,chatMessage:ChatMessage)=>Promise<void>
 }
 
 export const groupChatsListState = atom<Array<GroupChat>>({ //
@@ -18,6 +19,13 @@ export const groupChatSelectState = atom<GroupChat | null>({ //
     key:'GroupChat',
     default:null,
 });
+
+
+export const groupChatSelectUsers = atom<Array<UserChat>>({ //
+    key:'UsersGroupChat',
+    default:[],
+});
+
 
 export const groupChatState = selector<GroupChatStateInterface>({
     key:'GroupChatState',
@@ -45,10 +53,34 @@ export const groupChatState = selector<GroupChatStateInterface>({
         }
 
         // * No returns
-        const sendMessage = async (set:SetterOrUpdater<any[]>,groupId:string,chatMessage:ChatMessage) =>{
-            console.log('GroupId',chatMessage);
+        const sendMessage = async (set:SetterOrUpdater<any[]>,setSelect:SetterOrUpdater<any>,groupId:string,chatMessage:ChatMessage) =>{
             
-            //set(g => [...g,g[0].messages.push(chatMessage.message)])
+            const index = groupChats.findIndex(g => g.id == groupId);
+            if(index == -1) return;
+
+            //groupChats[index].messages.push(chatMessage);
+            const groupS = {...groupChats[index],messages:[...groupChats[index].messages]};
+            groupS.messages.push(chatMessage)
+            
+            databaseSendMessageGroup(groupS.id,chatMessage).then(()=>{
+                // Todo Possible mark message as send
+                //console.log('Mensaje',chatMessage.message,"guardado.");
+            })
+
+            //? Possible not neccesary 
+            let newList = [...groupChats].map((item) => {
+                
+                if (item.id === groupId){
+                    let messages = [...item.messages];
+                    messages.push(chatMessage);
+                    return { ...item, messages:messages  };
+                } 
+                else return item;
+              });
+
+            set(newList);
+
+            setSelect(groupS);
             
         }
         
