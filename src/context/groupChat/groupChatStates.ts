@@ -28,7 +28,7 @@ export const groupChatSelectUsers = atom<Array<UserChat>>({ //
 });
 
 export const groupChatFilter = atom<string>({
-    key: 'gfilter',
+    key: 'Groupfilter',
     default:""
 });
 
@@ -40,7 +40,7 @@ export const groupChatState = selector<GroupChatStateInterface>({
         
         const groupChats:Array<GroupChat>  = get(groupChatsListState)
         const filter = get(groupChatFilter)
-        const groupFiltered:Array<GroupChat> = groupChats.filter((group)=> filter.trim() == '' || filter.indexOf(group.name) != -1 )
+        const groupFiltered:Array<GroupChat> = groupChats.filter((group)=> filter.trim() == '' || group.name.includes(filter) )
         
         const getGroupChats = async (set:SetterOrUpdater<GroupChat[]>,arraysIds:Array<string>):Promise<Array<GroupChat>> => {
             try {

@@ -82,8 +82,6 @@ const Sidebar = () => {
   }
   
   function filterCall(text:string) {
-    console.log("Valor puesto text",text);
-    
     setTimeout(()=>{
       setGFilter(text)
     },10)
