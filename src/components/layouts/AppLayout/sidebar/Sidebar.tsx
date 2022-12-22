@@ -2,7 +2,7 @@ import React,{useState,useEffect} from 'react'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { topbarToggle } from '../topbar/Topbar'
 import {AiOutlineSearch} from 'react-icons/ai'
-import { groupChatState, groupChatsListState, groupChatSelectState, groupChatSelectUsers, groupChatFilter } from '@context/groupChat/groupChatStates'
+import { groupChatState, groupChatsListState, groupChatSelectState, groupChatSelectUsers,groupChatFilter } from '@context/groupChat/groupChatStates'
 import {GrFormAdd} from 'react-icons/gr'
 import AddModal from '@components/addModal/AddModal'
 import { useAuth } from '@context/auth/AuthContext'
@@ -13,7 +13,7 @@ const Sidebar = () => {
   
   const topbar = useRecoilValue(topbarToggle);
   const {groupChats,getGroupChats,groupFiltered,createGroupChat} = useRecoilValue(groupChatState);
-  const setFilter = useSetRecoilState(groupChatFilter);
+  const setGFilter = useSetRecoilState(groupChatFilter);
   const setGroupChats = useSetRecoilState(groupChatsListState);
   const [groupSelected,setSelectGroup] = useRecoilState(groupChatSelectState);
   const setUsers = useSetRecoilState(groupChatSelectUsers);
@@ -81,6 +81,13 @@ const Sidebar = () => {
     
   }
   
+  function filterCall(text:string) {
+    console.log("Valor puesto text",text);
+    
+    setTimeout(()=>{
+      setGFilter(text)
+    },10)
+  }
 
 
   return (
@@ -92,7 +99,7 @@ const Sidebar = () => {
 
       <div className='flex  items-center rounded mt-2 border border-black   px-2 sm:w-fit   self-center '>
         <AiOutlineSearch  size={25}/>
-        <input className='flex-1 h-full py-2 outline-0 rounded' placeholder='Search' onChange={(e)=>{setFilter(e.target.value)}}/>
+        <input className='flex-1 h-full py-2 outline-0 rounded' placeholder='Search' onChange={(e)=>{filterCall(e.target.value)}}/>
       </div> 
       
       <div className='mt-2 mx-[8px] flex-1 overflow-auto'>
@@ -103,7 +110,7 @@ const Sidebar = () => {
         </section>
         
         <div className='mt-2 mx-1'>
-          {groupChats.map((item,index)=>(
+          {groupFiltered.map((item,index)=>(
             <div onClick={()=>selectGroup(item)} 
             className={`${'p-2   rounded my-3 flex items-center gap-3 duration-200'} + 
             ${item.id == groupSelected?.id ? 'bg-[#379CD6] hover:bg-[#298ac2]'  : 'bg-[#D9D9D9] hover:bg-[#bebebe]'} `} key={index}>
