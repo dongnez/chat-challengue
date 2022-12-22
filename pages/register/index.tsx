@@ -50,7 +50,7 @@ const Register = () => {
         try {
             //TODO Loader
             await register(user.email,user.password,user.name,user.photoUrl);
-            router.push('/login');
+            router.push('/app');
         } catch (error) {
           if(error instanceof FirebaseError) setError(error.code); 
 
