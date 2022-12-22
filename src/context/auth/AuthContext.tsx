@@ -67,6 +67,7 @@ export default function AuthProvider(props:{children:React.ReactNode}){
 
             const userChat:UserChat = { uid:user.uid,email:email,groups:[],name:name,image:'' }
             await registerUser(userChat,photoUrl);
+            closeSession();
         })
     }
     const login = (email:string,password:string) => signInWithEmailAndPassword(auth,email,password);
